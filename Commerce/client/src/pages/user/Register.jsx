@@ -15,7 +15,7 @@ export const Register = () => {
           <Box className="body" w={"390px"} h="auto">
             <RegisterUser />
           </Box>
-          <Box className="footer" w={"390px"} h="57px" zIndex={2} pos="fixed">
+          <Box className="footer" w={"390px"} h="57px">
             <HasAcctButton />
           </Box>
         </Stack>

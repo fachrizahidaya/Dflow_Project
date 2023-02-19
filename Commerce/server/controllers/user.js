@@ -5,6 +5,7 @@ const jwt = require("jsonwebtoken");
 const transporter = require("../middleware/transporter");
 const fs = require("fs");
 const handlebars = require("handlebars");
+const { Op } = require("sequelize");
 
 module.exports = {
   create: async (req, res) => {
@@ -212,6 +213,109 @@ module.exports = {
       });
     } catch (err) {
       console.log(err);
+      res.status(400).send(err);
+    }
+  },
+
+  loginUser: async (req, res) => {
+    try {
+      const { email, password, id } = req.body;
+      const isAccountExist = await user.findOne({
+        where: {
+          [Op.or]: {
+            email: email ? email : "",
+            id: id ? id : 0,
+          },
+        },
+        raw: true,
+      });
+
+      if (isAccountExist === null) throw `Account not found`;
+      const payload = {
+        email: isAccountExist.email,
+        id: isAccountExist.id,
+        isVerified: isAccountExist.isVerified,
+      };
+
+      const token = jwt.sign(payload, "commerce");
+      const isValid = await bcrypt.compare(password, isAccountExist.password);
+      if (!isValid) throw `Password incorrect`;
+
+      res.status(200).send({
+        message: "Login success",
+        isAccountExist,
+        token,
+      });
+    } catch (err) {
+      res.status(400).send(err);
+    }
+  },
+
+  loginAdmin: async (req, res) => {
+    try {
+      const { email, password, id, isAdmin } = req.body;
+      const isAccountExist = await user.findOne({
+        where: {
+          [Op.or]: {
+            email: email ? email : "",
+            id: id ? id : 0,
+            isAdmin: isAdmin ? false : true,
+          },
+        },
+        raw: true,
+      });
+
+      if (isAccountExist === null) throw `Account not found`;
+      const payload = {
+        email: isAccountExist.email,
+        id: isAccountExist.id,
+        isVerified: isAccountExist.isVerified,
+        isAdmin: isAccountExist.isAdmin,
+      };
+
+      const token = jwt.sign(payload, "commerce");
+      const isValid = await bcrypt.compare(password, isAccountExist.password);
+      if (!isValid) throw `Password incorrect`;
+
+      res.status(200).send({
+        message: "Login success",
+        isAccountExist,
+        token,
+      });
+    } catch (err) {
+      console.log(err);
+      res.status(400).send(err);
+    }
+  },
+
+  keepLogin: async (req, res) => {
+    try {
+      const verify = jwt.verify(req.token, "commerce");
+      const result = await user.findOne({
+        where: {
+          email: verify.email,
+          id: verify.id,
+        },
+        raw: true,
+      });
+      res.status(200).send(result);
+    } catch (err) {
+      res.status(400).send(err);
+    }
+  },
+
+  keepLoginAdmin: async (req, res) => {
+    try {
+      const verify = jwt.verify(req.token, "commerce");
+      const result = await user.findOne({
+        where: {
+          email: verify.email,
+          id: verify.id,
+        },
+        raw: true,
+      });
+      res.status(200).send(result);
+    } catch (err) {
       res.status(400).send(err);
     }
   },

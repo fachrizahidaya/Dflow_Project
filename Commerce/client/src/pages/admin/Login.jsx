@@ -7,7 +7,7 @@ export const LoginAdmin = () => {
     <div>
       <Box>
         <Stack align={"center"}>
-          <Box className="header"></Box>
+          <Box className="header" h={"92px"}></Box>
           <Box className="body">
             <Login />
           </Box>

@@ -20,8 +20,7 @@ import { syncData } from "../../redux/productSlice";
 import { useEffect } from "react";
 
 export const Menu = () => {
-  //   const [data, setData] = useState();
-  const data2 = useSelector((state) => state.productSlice.value);
+  const data = useSelector((state) => state.productSlice.value);
   const dispatch = useDispatch();
 
   const allProduct = async () => {
@@ -41,7 +40,7 @@ export const Menu = () => {
   return (
     <div>
       <Wrap ml={"20px"} mr={"20px"}>
-        {data2?.map((item) => {
+        {data?.map((item) => {
           return (
             <Card w={"165px"} h="270px">
               <CardBody>

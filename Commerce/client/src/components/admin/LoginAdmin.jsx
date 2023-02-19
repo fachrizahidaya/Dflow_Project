@@ -8,7 +8,7 @@ export const Login = () => {
       <Box pl={"10px"} pr={"10px"} pt={"10px"} pb="10px" boxShadow={"base"}>
         <Stack spacing={"10px"}>
           <FormControl>
-            <Input w={"300px"} placeholder="Username"></Input>
+            <Input w={"300px"} placeholder="Email"></Input>
           </FormControl>
           <FormControl>
             <Input w={"300px"} placeholder="Password"></Input>
