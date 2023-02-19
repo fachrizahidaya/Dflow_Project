@@ -1,48 +1,45 @@
 import "./App.css";
-import { Route, Routes } from "react-router-dom";
 import io from "socket.io-client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { Chat } from "./Chat";
 const socket = io.connect("http://localhost:3001");
 
 function App() {
-  const [message, setMessage] = useState("");
-  const [received, setReceived] = useState("");
   const [room, setRoom] = useState("");
+  const [username, setUsername] = useState("");
+  const [showChat, setShowChat] = useState(false);
 
   const joinRoom = () => {
-    if (room !== "") {
+    if (username !== "" && room !== "") {
       socket.emit("join_room", room);
+      setShowChat(true);
     }
   };
 
-  const sendMessage = () => {
-    socket.emit("send_message", { message, room });
-  };
-  
-  useEffect(() => {
-    socket.on("receive_message", (data) => {
-      setReceived(data.message);
-    });
-  }, [socket]);
-
   return (
     <div className="App">
-      <input
-        placeholder="Message..."
-        onChange={(e) => {
-          setRoom(e.target.value);
-        }}
-      />
-      <button onClick={joinRoom}>Join room</button>
-      <input
-        placeholder="Message..."
-        onChange={(e) => {
-          setMessage(e.target.value);
-        }}
-      />
-      <button onClick={sendMessage}>Send message</button>
-      <h4>Message:</h4>
-      {received}
+      {!showChat ? (
+        <div className="joinChatContainer">
+          <h3>Join a chat</h3>
+          <input
+            type={"text"}
+            placeholder="Name"
+            onChange={(event) => {
+              setUsername(event.target.value);
+            }}
+          />
+          <input
+            type={"text"}
+            placeholder="Room ID"
+            onChange={(event) => {
+              setRoom(event.target.value);
+            }}
+          />
+          <button onClick={joinRoom}>Join room</button>
+        </div>
+      ) : (
+        <Chat socket={socket} username={username} room={room} />
+      )}
     </div>
   );
 }
