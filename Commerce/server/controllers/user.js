@@ -47,6 +47,7 @@ module.exports = {
         token,
       });
     } catch (err) {
+      console.log(err);
       res.status(400).send(err);
     }
   },
@@ -54,17 +55,22 @@ module.exports = {
   verification: async (req, res) => {
     try {
       const { codeOtp } = req.body;
+
       const isAccountExist = await user.findOne({
         where: {
           email: req.user.email,
         },
         raw: true,
       });
+
       const isValid = await bcrypt.compare(codeOtp, isAccountExist.codeOtp);
+
       if (!isValid) throw `Incorrect OTP Code`;
+
       await user.update(
         {
           isVerified: true,
+          isAdmin: false,
         },
         {
           where: {
@@ -74,9 +80,10 @@ module.exports = {
       );
       res.status(200).send({
         message: "Verification success",
-        isAccountExist,
+        data: isAccountExist,
       });
     } catch (err) {
+      console.log(err);
       res.status(400).send(err);
     }
   },
@@ -128,4 +135,84 @@ module.exports = {
     }
   },
 
+  createAdmin: async (req, res) => {
+    try {
+      const { firstName, lastName, email, password, password_confirmation } =
+        req.body;
+      if (password !== password_confirmation) throw `Password not match`;
+      if (password.length < 8) throw `Minimum password 8 characters`;
+      const codeOtp = Math.floor(100000 + Math.random() * 900000).toString();
+      const salt = await bcrypt.genSalt(10);
+      const hashPass = await bcrypt.hash(password, salt);
+      const hashOtp = await bcrypt.hash(codeOtp, salt);
+
+      const register = await user.create({
+        firstName,
+        lastName,
+        email,
+        password: hashPass,
+        codeOtp: hashOtp,
+      });
+      const token = jwt.sign({ email: email }, "commerce", {
+        expiresIn: "1h",
+      });
+
+      const tempEmail = fs.readFileSync("./template/codeotp.html", "utf-8");
+      const tempCompile = handlebars.compile(tempEmail);
+      const tempResult = tempCompile({
+        email,
+        codeOtp,
+      });
+      await transporter.sendMail({
+        from: "E-commerce",
+        to: email,
+        subject: "Account Verification",
+        html: tempResult,
+      });
+      res.status(200).send({
+        message: "Verification code sent to your Email",
+        register,
+        token,
+      });
+    } catch (err) {
+      console.log(err);
+      res.status(400).send(err);
+    }
+  },
+
+  verificationAdmin: async (req, res) => {
+    try {
+      const { codeOtp } = req.body;
+
+      const isAccountExist = await user.findOne({
+        where: {
+          email: req.user.email,
+        },
+        raw: true,
+      });
+
+      const isValid = await bcrypt.compare(codeOtp, isAccountExist.codeOtp);
+
+      if (!isValid) throw `Incorrect OTP Code`;
+
+      await user.update(
+        {
+          isVerified: false,
+          isAdmin: true,
+        },
+        {
+          where: {
+            email: req.user.email,
+          },
+        }
+      );
+      res.status(200).send({
+        message: "Verification success",
+        data: isAccountExist,
+      });
+    } catch (err) {
+      console.log(err);
+      res.status(400).send(err);
+    }
+  },
 };

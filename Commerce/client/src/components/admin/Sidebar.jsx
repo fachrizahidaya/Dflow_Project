@@ -7,10 +7,9 @@ export const Sidebar = () => {
       <Stack align={"center"}>
         <Avatar name="riza"></Avatar>
         <Badge>Riza</Badge>
-        <Button>lu</Button>
-        <Button>lu</Button>
-        <Button>lu</Button>
-        <Button>lu</Button>
+        <Button>Dashboard</Button>
+        <Button>Product</Button>
+        <Button>Transaction</Button>
       </Stack>
     </div>
   );

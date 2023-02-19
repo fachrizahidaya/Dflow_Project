@@ -1,5 +1,6 @@
 import { Box, Button, Flex, Grid } from "@chakra-ui/react";
 import React from "react";
+import { Product } from "../../components/admin/Product";
 import { Sidebar } from "../../components/admin/Sidebar";
 
 export const Dashboard = () => {
@@ -14,7 +15,7 @@ export const Dashboard = () => {
             <Button>la</Button>
           </Box>
           <Box w={"1420px"} h="600px" className="content">
-            <Button>la</Button>
+            <Product />
           </Box>
           <Box w={"1420px"} h="60px" className="footer">
             <Button>la</Button>
