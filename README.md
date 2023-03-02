@@ -1,6 +1,6 @@
 # Project for DFLOW
 
-This is monorepo contain frontend project using ReactJS and backend project using ExpressJS.
+Projects that contain Commerce App and Chat App as Evaluation Test for DFLOW (dflow.com.au). This is monorepo contain frontend project using ReactJS and backend project using ExpressJS.
 
 ## Available Scripts
 
